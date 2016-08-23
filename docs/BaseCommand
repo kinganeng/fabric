@@ -1,0 +1,36 @@
+
+启动超级账本集群：
+docker-compose -f docker-compose-with-membersrvc.yml up
+关闭集群：
+docker-compose -f docker-compose-with-membersrvc.yml stop
+进入容器：
+docker exec -it 容器ID /bin/bash
+
+
+
+注册登录：
+curl -i -X POST -H "Content-Type: application/json" http://10.10.67.221:7050/registrar -d '{"enrollId":"jim","enrollSecret":"6avZQLwcUe9b"}'
+
+
+部署合约，并初始化参数：
+curl -i -X POST -H "Content-Type: application/json" http://10.10.67.221:7050/chaincode -d '{"jsonrpc":"2.0","method":"deploy","params":{"type":1,"chaincodeID":{"path":"github.com/hyperledger/fabric/examples/chaincode/go/chaincode_example02"},"ctorMsg":{"function":"init","args":["C","10000000000","D","0"]},"secureContext":"jim"},"id":1}'
+
+生成合约地址：
+4a7218f3d74b2ba2a7df77b6637d388e3bf862c2bc1a209f88a0a096115cd685e2e6e4b138a5613d2ca2eaab3a79f77f8a9148979c5e3d09b6442f372681868a
+
+查询账户余额：
+curl -i -X POST -H "Content-Type: application/json" http://10.10.67.221:7050/chaincode -d '{"jsonrpc": "2.0","method": "query","params": {"type": 1,"chaincodeID":{"name":"4a7218f3d74b2ba2a7df77b6637d388e3bf862c2bc1a209f88a0a096115cd685e2e6e4b138a5613d2ca2eaab3a79f77f8a9148979c5e3d09b6442f372681868a"},"ctorMsg": {"function":"query","args":["C"]},"secureContext": "jim"},"id": 5}'
+
+转账：
+curl -i -X POST -H "Content-Type: application/json" http://10.10.67.221:7050/chaincode -d '{"jsonrpc":"2.0","method":"invoke","params":{"type":1,"chaincodeID":{"name":"4a7218f3d74b2ba2a7df77b6637d388e3bf862c2bc1a209f88a0a096115cd685e2e6e4b138a5613d2ca2eaab3a79f77f8a9148979c5e3d09b6442f372681868a"},"ctorMsg":{"function":"invoke","args":["C","D","1"]},"secureContext":"jim"},"id":3}'
+
+
+网页访问：http://10.10.67.221:7050
+
+1> +/chain  查询网络中当前的块高度
+2> +/chain/blocks/{n}  查询第n个块中的存储信息
+3> +/transactions/{uuid}  通过交易UUID查询交易信息
+4> +/network/peers 查询网络中的节点信息
+
+
+
